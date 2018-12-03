@@ -14,6 +14,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Timer timer;
   DateTime now = DateTime.now();
   TimeOfDay comeIn;
+  Duration breaks = Duration(minutes: 33);
 
   _MyHomePageState() : super() {
     comeIn = new TimeOfDay(hour: 8, minute: 34);
@@ -63,9 +64,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return DateTime(now.year, now.month, now.day, t.hour, t.minute);
   }
 
+  DateTime _DtoTD(Duration d) {
+    int minutes = d.inMinutes.remainder(Duration.minutesPerHour);
+    return DateTime(now.year, now.month, now.day, d.inHours, minutes);
+  }
+
+  Duration _TDtoD(TimeOfDay d) {
+    return Duration(hours: d.hour, minutes: d.minute);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var breaks = Duration(minutes: 33);
     var dur77 = Duration(hours: 7, minutes: 42);
     var plus77 = _toDT(comeIn).add(dur77);
     plus77 = plus77.add(breaks);
@@ -100,7 +109,9 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             new AnnotatedNumber(_timeD(breaks), "Breaks",
-                fontSize: smallFontSize),
+                fontSize: smallFontSize, onTap: () {
+              selectBreaks(context);
+            }),
           ]),
       new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,15 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: smallFontSize),
             new AnnotatedNumber(_timeD(remain10), "Remaining",
                 fontSize: smallFontSize),
-
           ]),
-      new Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            new Container(
-                alignment: Alignment.bottomRight,
-                child: Text("Updated: " + DateTime.now().toString()))
-          ]),
+      new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+        new Container(
+            alignment: Alignment.bottomRight,
+            child: Text("Updated: " + DateTime.now().toString()))
+      ]),
     ];
 
     return new Scaffold(
@@ -152,4 +160,14 @@ class _MyHomePageState extends State<MyHomePage> {
       comeIn = time;
     }
   }
+
+  void selectBreaks(BuildContext context) async {
+    var time = await showTimePicker(
+        context: context, initialTime: TimeOfDay.fromDateTime(_DtoTD(breaks)));
+    print(time);
+    if (null != time) {
+      breaks = _TDtoD(time);
+    }
+  }
+
 }
