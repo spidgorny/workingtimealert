@@ -86,19 +86,20 @@ class _MyHomePageState extends State<MyHomePage> {
     var remain10 = dur10 - working;
 
     final double smallFontSize = 32;
-    var rows = <Widget>[
-      new Row(
+    var rowTime = new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-                child: AnnotatedNumber(_timeD(working), "Working Time Today")),
-          ]),
-      new Row(
+//            Expanded(
+//                child:
+            AnnotatedNumber(_timeD(working), "Working Time Today")
+//            ),
+          ]);
+    var rowInput = new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new AnnotatedNumber(
               _timeT(comeIn),
@@ -112,27 +113,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: smallFontSize, onTap: () {
               selectBreaks(context);
             }),
-          ]),
-      new Row(
+          ]);
+    var row77 = new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new AnnotatedNumber(_time(plus77), "+ 7.7h",
                 fontSize: smallFontSize),
             new AnnotatedNumber(_timeD(remain77), "Remaining",
                 fontSize: smallFontSize),
-          ]),
-      new Row(
+          ]);
+    var row10 = new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new AnnotatedNumber(_time(plus10), "+ 10h",
                 fontSize: smallFontSize),
             new AnnotatedNumber(_timeD(remain10), "Remaining",
                 fontSize: smallFontSize),
-          ]),
+          ]);
+    var rows = <Widget>[
+      rowTime,
+      rowInput,
+      row77,
+      row10,
       new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
         new Container(
             alignment: Alignment.bottomRight,
@@ -140,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ]),
     ];
 
+    print('render');
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Working Time Alert'),
@@ -155,9 +162,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void selectComeIn(BuildContext context) async {
     var time = await showTimePicker(
         context: context, initialTime: TimeOfDay.fromDateTime(_toDT(comeIn)));
-    print(time);
+    //print(time);
     if (null != time) {
-      comeIn = time;
+      setState(() {
+        comeIn = time;
+      });
     }
   }
 
@@ -166,8 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context, initialTime: TimeOfDay.fromDateTime(_DtoTD(breaks)));
     print(time);
     if (null != time) {
-      breaks = _TDtoD(time);
+      setState(() {
+        breaks = _TDtoD(time);
+      });
     }
   }
-
 }

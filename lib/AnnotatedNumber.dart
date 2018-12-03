@@ -15,8 +15,9 @@ class AnnotatedNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return
-      IntrinsicWidth(
-        child:
+//      IntrinsicWidth(
+//        child:
+    Flexible(child:
         InkWell(
             child: Container(
               margin: EdgeInsets.all(10),
@@ -45,6 +46,7 @@ class AnnotatedNumber extends StatelessWidget {
                 new Text(annotation),
               ]),
             ),
-            onTap: onTap));
+            onTap: onTap)
+    );
   }
 }
