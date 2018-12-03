@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   static String _twoDigits(int n) {
+    n = n.abs();
     if (n >= 10) return "${n}";
     return "0${n}";
   }
@@ -43,9 +44,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return _twoDigits(comeIn.hour) + ':' + _twoDigits(comeIn.minute);
   }
 
+  static String _sign(Duration comeIn) {
+    if (comeIn.isNegative) {
+      return '-';
+    }
+    return '';
+  }
+
   static String _timeD(Duration comeIn) {
     int minutes = comeIn.inMinutes.remainder(Duration.minutesPerHour);
-    return _twoDigits(comeIn.inHours) + ':' + _twoDigits(minutes);
+    return _sign(comeIn) +
+        _twoDigits(comeIn.inHours) +
+        ':' +
+        _twoDigits(minutes);
   }
 
   DateTime _toDT(TimeOfDay t) {
@@ -65,34 +76,60 @@ class _MyHomePageState extends State<MyHomePage> {
     var remain77 = dur77 - working;
     var remain10 = dur10 - working;
 
+    final double smallFontSize = 32;
     var rows = <Widget>[
-      new AnnotatedNumber(_timeD(working), "Working Time Today"),
       new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: AnnotatedNumber(_timeD(working), "Working Time Today")),
+          ]),
+      new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             new AnnotatedNumber(
               _timeT(comeIn),
               "Come In",
-              fontSize: 34,
+              fontSize: smallFontSize,
               onTap: () {
                 selectComeIn(context);
               },
             ),
-            new AnnotatedNumber(_time(plus77), "+ 7.7h", fontSize: 34),
-            new AnnotatedNumber(_time(plus10), "+ 10h", fontSize: 34),
+            new AnnotatedNumber(_timeD(breaks), "Breaks",
+                fontSize: smallFontSize),
           ]),
       new Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            new AnnotatedNumber(_timeD(breaks), "Breaks", fontSize: 34),
-            new AnnotatedNumber(_timeD(remain77), "Remaining", fontSize: 34),
-            new AnnotatedNumber(_timeD(remain10), "Remaining", fontSize: 34),
+            new AnnotatedNumber(_time(plus77), "+ 7.7h",
+                fontSize: smallFontSize),
+            new AnnotatedNumber(_timeD(remain77), "Remaining",
+                fontSize: smallFontSize),
           ]),
-      Text("Updated: " + DateTime.now().toString())
+      new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            new AnnotatedNumber(_time(plus10), "+ 10h",
+                fontSize: smallFontSize),
+            new AnnotatedNumber(_timeD(remain10), "Remaining",
+                fontSize: smallFontSize),
+
+          ]),
+      new Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            new Container(
+                alignment: Alignment.bottomRight,
+                child: Text("Updated: " + DateTime.now().toString()))
+          ]),
     ];
 
     return new Scaffold(
