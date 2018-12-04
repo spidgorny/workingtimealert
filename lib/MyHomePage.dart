@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 import 'AnnotatedNumber.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -14,21 +16,28 @@ class _MyHomePageState extends State<MyHomePage> {
   Timer timer;
   DateTime now = DateTime.now();
   TimeOfDay comeIn;
-  Duration breaks = Duration(minutes: 33);
+  Duration breaks;
+//  SharedPreferences prefs;
 
-  _MyHomePageState() : super() {
+  _MyHomePageState() : super();
+
+  @override
+  void initState() {
+    super.initState();
+//    prefs = await SharedPreferences.getInstance();
+
     comeIn = new TimeOfDay(hour: 8, minute: 34);
+
+//    int breaksMinutes = prefs.getString('breaks') ?? 0;
+//    print('breaksMinutes ' + breaksMinutes.toString());
+    breaks = Duration(minutes: 33);
+
     timer = new Timer.periodic(
         new Duration(milliseconds: 10 * Duration.millisecondsPerSecond), (t) {
       setState(() {
         now = DateTime.now();
       });
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   static String _twoDigits(int n) {
@@ -75,87 +84,99 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var minBreaks = (breaks.inHours > 9)
+        ? Duration(minutes: 45)
+        : (breaks.inHours > 6) ? Duration(minutes: 30) : Duration();
+    var breaksPlus =
+        Duration(minutes: max(minBreaks.inMinutes, breaks.inMinutes));
     var dur77 = Duration(hours: 7, minutes: 42);
-    var plus77 = _toDT(comeIn).add(dur77);
-    plus77 = plus77.add(breaks);
+    var plus77 = _toDT(comeIn).add(dur77).add(breaks);
     var dur10 = Duration(hours: 10);
-    var plus10 = _toDT(comeIn).add(dur10);
-    plus10 = plus10.add(breaks);
+    var plus10 = _toDT(comeIn).add(dur10).add(breaks);
     var working = DateTime.now().difference(_toDT(comeIn));
+    working -= breaksPlus;
     var remain77 = dur77 - working;
     var remain10 = dur10 - working;
 
     final double smallFontSize = 32;
     var rowTime = new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-//            Expanded(
-//                child:
-            AnnotatedNumber(_timeD(working), "Working Time Today")
-//            ),
-          ]);
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          AnnotatedNumber(_timeD(working), "Working Time Today", bar: working.inMinutes / 10 / 60)
+        ]);
     var rowInput = new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            new AnnotatedNumber(
-              _timeT(comeIn),
-              "Come In",
-              fontSize: smallFontSize,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new AnnotatedNumber(
+            _timeT(comeIn),
+            "Come In",
+            fontSize: smallFontSize,
+            onTap: () {
+              selectComeIn(context);
+            },
+          ),
+          new AnnotatedNumber(_timeD(breaks), "Breaks", fontSize: smallFontSize,
               onTap: () {
-                selectComeIn(context);
-              },
-            ),
-            new AnnotatedNumber(_timeD(breaks), "Breaks",
-                fontSize: smallFontSize, onTap: () {
-              selectBreaks(context);
-            }),
-          ]);
+            selectBreaks(context);
+          }),
+        ]);
     var row77 = new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            new AnnotatedNumber(_time(plus77), "+ 7.7h",
-                fontSize: smallFontSize),
-            new AnnotatedNumber(_timeD(remain77), "Remaining",
-                fontSize: smallFontSize),
-          ]);
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new AnnotatedNumber(_time(plus77), "+ 7.7h", fontSize: smallFontSize),
+          new AnnotatedNumber(_timeD(remain77), "Remaining",
+              fontSize: smallFontSize),
+        ]);
     var row10 = new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            new AnnotatedNumber(_time(plus10), "+ 10h",
-                fontSize: smallFontSize),
-            new AnnotatedNumber(_timeD(remain10), "Remaining",
-                fontSize: smallFontSize),
-          ]);
-    var rows = <Widget>[
-      rowTime,
-      rowInput,
-      row77,
-      row10,
-      new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-        new Container(
-            alignment: Alignment.bottomRight,
-            child: Text("Updated: " + DateTime.now().toString()))
-      ]),
-    ];
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new AnnotatedNumber(_time(plus10), "+ 10h", fontSize: smallFontSize),
+          new AnnotatedNumber(_timeD(remain10), "Remaining",
+              fontSize: smallFontSize),
+        ]);
+    var rowOvertimeMonth = new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[AnnotatedNumber("??:??", "Overtime Current Month")]);
+    var rowOvertimeTotal = new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[AnnotatedNumber("??:??", "Total Overtime")]);
 
     print('render');
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Working Time Alert'),
       ),
-      body: new Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: rows),
+      body: SingleChildScrollView(
+          child: new Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          rowTime,
+          rowInput,
+          row77,
+          row10,
+          rowOvertimeMonth,
+          rowOvertimeTotal,
+          new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+            new Container(
+                alignment: Alignment.bottomRight,
+                child: Text("Updated: " + DateTime.now().toString()))
+          ])
+        ],
+      )),
     );
   }
 
@@ -175,8 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context, initialTime: TimeOfDay.fromDateTime(_DtoTD(breaks)));
     print(time);
     if (null != time) {
-      setState(() {
+      setState(() async {
         breaks = _TDtoD(time);
+//        await prefs.setString('breaks', time.toString());
       });
     }
   }
