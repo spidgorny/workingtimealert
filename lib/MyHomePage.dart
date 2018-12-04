@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 
 //import 'package:shared_preferences/shared_preferences.dart';
 import 'AnnotatedNumber.dart';
@@ -20,6 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Duration breaks;
 
 //  SharedPreferences prefs;
+  final LocalStorage storage = new LocalStorage('MyHomePage');
 
   _MyHomePageState() : super();
 
@@ -28,11 +30,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 //    prefs = await SharedPreferences.getInstance();
 
-    comeIn = new TimeOfDay(hour: 8, minute: 34);
+    comeIn = new TimeOfDay(hour: 8, minute: 30);
+    initComeIn();
 
-//    int breaksMinutes = prefs.getString('breaks') ?? 0;
-//    print('breaksMinutes ' + breaksMinutes.toString());
-    breaks = Duration(minutes: 33);
+    breaks = Duration(minutes: 30);
+    initBreaks();
 
     timer = new Timer.periodic(
         new Duration(milliseconds: 10 * Duration.millisecondsPerSecond), (t) {
@@ -40,6 +42,33 @@ class _MyHomePageState extends State<MyHomePage> {
         now = DateTime.now();
       });
     });
+  }
+
+  void initComeIn() async {
+    print('await storage.ready');
+    await storage.ready;
+    int iComeIn = storage.getItem('comeIn');
+    print('iComeIn ' + iComeIn.toString());
+    if (iComeIn != null) {
+      setState(() {
+        comeIn = TimeOfDay(
+            hour: (iComeIn / Duration.minutesPerHour).round(),
+            minute: iComeIn % Duration.minutesPerHour);
+      });
+    }
+  }
+
+  void initBreaks() async {
+    //    int breaksMinutes = prefs.getString('breaks') ?? 0;
+    print('await storage.ready');
+    await storage.ready;
+    int iBreaks = storage.getItem('breaks');
+    print('iBreaks ' + iBreaks.toString());
+    if (iBreaks != null) {
+      setState(() {
+        breaks = Duration(minutes: iBreaks);
+      });
+    }
   }
 
   static String _twoDigits(int n) {
@@ -202,6 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         comeIn = time;
       });
+      await storage.setItem(
+          'comeIn', time.hour * Duration.minutesPerHour + time.minute);
     }
   }
 
@@ -210,10 +241,12 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context, initialTime: TimeOfDay.fromDateTime(_DtoTD(breaks)));
     print(time);
     if (null != time) {
-      setState(() async {
+      setState(() {
         breaks = _TDtoD(time);
-//        await prefs.setString('breaks', time.toString());
       });
+//    await prefs.setString('breaks', time.toString());
+      await storage.setItem(
+          'breaks', time.hour * Duration.minutesPerHour + time.minute);
     }
   }
 }

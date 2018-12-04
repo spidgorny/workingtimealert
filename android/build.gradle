@@ -1,13 +1,14 @@
 buildscript {
     ext.kotlin_version = '1.2.71'
     repositories {
-//        mavenCentral()
-        google()
-        jcenter()
         maven {
 //            url "https://jitpack.io"
-            url "https://maven-central.storage.googleapis.com"
+//            url "https://maven-central.storage.googleapis.com"
+            url "http://repo.spring.io/plugins-release/"
         }
+        mavenCentral()
+        google()
+        jcenter()
     }
 
     dependencies {
@@ -18,13 +19,14 @@ buildscript {
 
 allprojects {
     repositories {
-//        mavenCentral()
-        google()
-        jcenter()
         maven {
 //            url "https://jitpack.io"
-            url "https://maven-central.storage.googleapis.com"
+//            url "https://maven-central.storage.googleapis.com"
+            url "http://repo.spring.io/plugins-release/"
         }
+        mavenCentral()
+        google()
+        jcenter()
     }
 }
 
