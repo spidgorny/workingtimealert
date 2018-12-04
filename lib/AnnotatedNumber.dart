@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AnnotatedNumber extends StatelessWidget {
   const AnnotatedNumber(this.number, this.annotation,
-      {Key key, this.fontSize = 54, this.onTap, this.bar})
+      {Key key, this.fontSize = 54, this.onTap, this.bar, this.backgroundColor})
       : super(key: key);
 
   final String number;
@@ -12,6 +12,7 @@ class AnnotatedNumber extends StatelessWidget {
   final double fontSize;
   final VoidCallback onTap;
   final double bar;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class AnnotatedNumber extends StatelessWidget {
                   padding: EdgeInsets.all(10.0),
                   alignment: Alignment.center,
                   decoration: new BoxDecoration(
-                    color: Colors.white,
+                    color: backgroundColor ?? Colors.white,
                     borderRadius:
                         new BorderRadius.all(new Radius.circular(5.0)),
                     boxShadow: [

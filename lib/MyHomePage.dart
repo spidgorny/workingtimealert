@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+
 //import 'package:shared_preferences/shared_preferences.dart';
 import 'AnnotatedNumber.dart';
 
@@ -17,6 +18,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime now = DateTime.now();
   TimeOfDay comeIn;
   Duration breaks;
+
 //  SharedPreferences prefs;
 
   _MyHomePageState() : super();
@@ -104,7 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          AnnotatedNumber(_timeD(working), "Working Time Today", bar: working.inMinutes / 10 / 60)
+          AnnotatedNumber(_timeD(working), "Working Time Today",
+              bar: working.inMinutes / 10 / 60)
         ]);
     var rowInput = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -124,15 +127,22 @@ class _MyHomePageState extends State<MyHomePage> {
             selectBreaks(context);
           }),
         ]);
+
     var row77 = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           new AnnotatedNumber(_time(plus77), "+ 7.7h", fontSize: smallFontSize),
-          new AnnotatedNumber(_timeD(remain77), "Remaining",
-              fontSize: smallFontSize),
+          new AnnotatedNumber(
+            _timeD(remain77),
+            "Remaining",
+            fontSize: smallFontSize,
+            backgroundColor:
+                remain77.inMinutes < 60 ? Colors.yellow : Colors.white,
+          ),
         ]);
+
     var row10 = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
@@ -140,13 +150,17 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           new AnnotatedNumber(_time(plus10), "+ 10h", fontSize: smallFontSize),
           new AnnotatedNumber(_timeD(remain10), "Remaining",
-              fontSize: smallFontSize),
+              fontSize: smallFontSize,
+              backgroundColor:
+                  remain10.inMinutes < 60 ? Colors.red : Colors.white),
         ]);
+
     var rowOvertimeMonth = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[AnnotatedNumber("??:??", "Overtime Current Month")]);
+
     var rowOvertimeTotal = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
