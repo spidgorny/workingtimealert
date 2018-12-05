@@ -1,4 +1,4 @@
-package de.nintendo.workingtimealert
+package com.androidfromfrankfurt.workingtimealert
 
 import android.os.Bundle
 
