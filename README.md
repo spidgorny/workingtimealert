@@ -2,7 +2,4 @@
 
 Never miss the time to go home
 
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+![Screenshot](docs/1xlL5sj.jpg)
