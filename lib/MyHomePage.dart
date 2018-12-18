@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-//import 'package:shared_preferences/shared_preferences.dart';
 import 'AnnotatedNumber.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -200,6 +200,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Working Time Alert'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () async {
+              const url =
+                  'https://github.com/spidgorny/workingtimealert/issues';
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
           child: new Column(
@@ -211,8 +225,8 @@ class _MyHomePageState extends State<MyHomePage> {
           rowInput,
           row77,
           row10,
-          rowOvertimeMonth,
-          rowOvertimeTotal,
+//          rowOvertimeMonth,
+//          rowOvertimeTotal,
           new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
             new Container(
                 alignment: Alignment.bottomRight,
