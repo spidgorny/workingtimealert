@@ -6,6 +6,8 @@ import 'package:localstorage/localstorage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'AnnotatedNumber.dart';
+import 'DurationRemaining.dart';
+import 'TimeUtils.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -71,48 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static String _twoDigits(int n) {
-    n = n.abs();
-    if (n >= 10) return "${n}";
-    return "0${n}";
-  }
-
-  static String _time(DateTime comeIn) {
-    return _twoDigits(comeIn.hour) + ':' + _twoDigits(comeIn.minute);
-  }
-
-  static String _timeT(TimeOfDay comeIn) {
-    return _twoDigits(comeIn.hour) + ':' + _twoDigits(comeIn.minute);
-  }
-
-  static String _sign(Duration comeIn) {
-    if (comeIn.isNegative) {
-      return '-';
-    }
-    return '';
-  }
-
-  static String _timeD(Duration comeIn) {
-    int minutes = comeIn.inMinutes.remainder(Duration.minutesPerHour);
-    return _sign(comeIn) +
-        _twoDigits(comeIn.inHours) +
-        ':' +
-        _twoDigits(minutes);
-  }
-
-  DateTime _toDT(TimeOfDay t) {
-    return DateTime(now.year, now.month, now.day, t.hour, t.minute);
-  }
-
-  DateTime _DtoTD(Duration d) {
-    int minutes = d.inMinutes.remainder(Duration.minutesPerHour);
-    return DateTime(now.year, now.month, now.day, d.inHours, minutes);
-  }
-
-  Duration _TDtoD(TimeOfDay d) {
-    return Duration(hours: d.hour, minutes: d.minute);
-  }
-
   @override
   Widget build(BuildContext context) {
     var minBreaks = (breaks.inHours > 9)
@@ -121,13 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var breaksPlus =
         Duration(minutes: max(minBreaks.inMinutes, breaks.inMinutes));
     var dur77 = Duration(hours: 7, minutes: 42);
-    var plus77 = _toDT(comeIn).add(dur77).add(breaks);
-    var dur10 = Duration(hours: 10);
-    var plus10 = _toDT(comeIn).add(dur10).add(breaks);
-    var working = DateTime.now().difference(_toDT(comeIn));
+    var plus77 = TimeUtils.toDT(comeIn).add(dur77).add(breaks);
+    var working = DateTime.now().difference(TimeUtils.toDT(comeIn));
     working -= breaksPlus;
     var remain77 = dur77 - working;
-    var remain10 = dur10 - working;
 
     final double smallFontSize = 32;
     var rowTime = new Row(
@@ -135,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          AnnotatedNumber(_timeD(working), "Working Time Today",
+          AnnotatedNumber(TimeUtils.timeD(working), "Working Time Today",
               bar: working.inMinutes / 10 / 60)
         ]);
     var rowInput = new Row(
@@ -144,15 +101,15 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           new AnnotatedNumber(
-            _timeT(comeIn),
+            TimeUtils.timeT(comeIn),
             "Come In",
             fontSize: smallFontSize,
             onTap: () {
               selectComeIn(context);
             },
           ),
-          new AnnotatedNumber(_timeD(breaks), "Breaks", fontSize: smallFontSize,
-              onTap: () {
+          new AnnotatedNumber(TimeUtils.timeD(breaks), "Breaks",
+              fontSize: smallFontSize, onTap: () {
             selectBreaks(context);
           }),
         ]);
@@ -162,9 +119,10 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new AnnotatedNumber(_time(plus77), "+ 7.7h", fontSize: smallFontSize),
+          new AnnotatedNumber(TimeUtils.time(plus77), "+ 7.7h",
+              fontSize: smallFontSize),
           new AnnotatedNumber(
-            _timeD(remain77),
+            TimeUtils.timeD(remain77),
             "Remaining",
             fontSize: smallFontSize,
             backgroundColor:
@@ -172,18 +130,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ]);
 
-    var row10 = new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new AnnotatedNumber(_time(plus10), "+ 10h", fontSize: smallFontSize),
-          new AnnotatedNumber(_timeD(remain10), "Remaining",
-              fontSize: smallFontSize,
-              backgroundColor:
-                  remain10.inMinutes < 60 ? Colors.red : Colors.white),
-        ]);
+    var dur10 = Duration(hours: 10);
+    var row10 = DurationRemaining(dur10, working, comeIn, breaks);
 
+    /*
     var rowOvertimeMonth = new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
@@ -195,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[AnnotatedNumber("??:??", "Total Overtime")]);
-
+    */
     print('render');
     return new Scaffold(
       appBar: new AppBar(
@@ -230,6 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
           new Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
             new Container(
                 alignment: Alignment.bottomRight,
+                padding: EdgeInsets.all(10),
                 child: Text("Updated: " + DateTime.now().toString()))
           ])
         ],
@@ -239,7 +190,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void selectComeIn(BuildContext context) async {
     var time = await showTimePicker(
-        context: context, initialTime: TimeOfDay.fromDateTime(_toDT(comeIn)));
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(TimeUtils.toDT(comeIn)));
     //print(time);
     if (null != time) {
       setState(() {
@@ -252,11 +204,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void selectBreaks(BuildContext context) async {
     var time = await showTimePicker(
-        context: context, initialTime: TimeOfDay.fromDateTime(_DtoTD(breaks)));
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(TimeUtils.DtoTD(breaks)));
     print(time);
     if (null != time) {
       setState(() {
-        breaks = _TDtoD(time);
+        breaks = TimeUtils.TDtoD(time);
       });
 //    await prefs.setString('breaks', time.toString());
       await storage.setItem(
