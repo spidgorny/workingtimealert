@@ -30,12 +30,13 @@ class DurationRemaining extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var durInH = (dur10.inMinutes / 60).toStringAsFixed(1);
     return new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new AnnotatedNumber(TimeUtils.time(plus10), "+ 10h",
+          new AnnotatedNumber(TimeUtils.time(plus10), "+ ${durInH}h",
               fontSize: smallFontSize),
           new AnnotatedNumber(TimeUtils.timeD(remain10), "Remaining",
               fontSize: smallFontSize,

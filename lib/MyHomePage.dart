@@ -80,11 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
         : (breaks.inHours > 6) ? Duration(minutes: 30) : Duration();
     var breaksPlus =
         Duration(minutes: max(minBreaks.inMinutes, breaks.inMinutes));
-    var dur77 = Duration(hours: 7, minutes: 42);
-    var plus77 = TimeUtils.toDT(comeIn).add(dur77).add(breaks);
     var working = DateTime.now().difference(TimeUtils.toDT(comeIn));
     working -= breaksPlus;
-    var remain77 = dur77 - working;
 
     final double smallFontSize = 32;
     var rowTime = new Row(
@@ -114,39 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
           }),
         ]);
 
-    var row77 = new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          new AnnotatedNumber(TimeUtils.time(plus77), "+ 7.7h",
-              fontSize: smallFontSize),
-          new AnnotatedNumber(
-            TimeUtils.timeD(remain77),
-            "Remaining",
-            fontSize: smallFontSize,
-            backgroundColor:
-                remain77.inMinutes < 60 ? Colors.yellow : Colors.white,
-          ),
-        ]);
-
+    var row77 = DurationRemaining(
+        Duration(hours: 7, minutes: 42), working, comeIn, breaks);
+    var row8 = DurationRemaining(Duration(hours: 8), working, comeIn, breaks);
     var dur10 = Duration(hours: 10);
     var row10 = DurationRemaining(dur10, working, comeIn, breaks);
 
-    /*
-    var rowOvertimeMonth = new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[AnnotatedNumber("??:??", "Overtime Current Month")]);
-
-    var rowOvertimeTotal = new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[AnnotatedNumber("??:??", "Total Overtime")]);
-    */
-    print('render');
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Working Time Alert'),
@@ -174,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
           rowTime,
           rowInput,
           row77,
+          row8,
           row10,
 //          rowOvertimeMonth,
 //          rowOvertimeTotal,
