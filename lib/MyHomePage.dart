@@ -97,14 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new AnnotatedNumber(
-            TimeUtils.timeT(comeIn),
-            "Come In",
-            fontSize: smallFontSize,
-            onTap: () {
-              selectComeIn(context);
-            },
-          ),
+          new AnnotatedNumber(TimeUtils.timeT(comeIn), "Come In",
+              fontSize: smallFontSize, onTap: () {
+            selectComeIn(context);
+          }, backgroundColor: Colors.blue[100]),
           new AnnotatedNumber(TimeUtils.timeD(breaks), "Breaks",
               fontSize: smallFontSize, onTap: () {
             selectBreaks(context);

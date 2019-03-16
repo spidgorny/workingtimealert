@@ -25,7 +25,7 @@ class DurationRemaining extends StatelessWidget {
 
     var working = DateTime.now().difference(TimeUtils.toDT(comeIn));
     working -= breaksPlus;
-    remain10 = dur10 - working;
+    remain10 = -dur10 + working;
   }
 
   @override
@@ -40,8 +40,11 @@ class DurationRemaining extends StatelessWidget {
               fontSize: smallFontSize),
           new AnnotatedNumber(TimeUtils.timeD(remain10), "Remaining",
               fontSize: smallFontSize,
-              backgroundColor:
-                  remain10.inMinutes < 60 ? Colors.red : Colors.white),
+              backgroundColor: remain10.inMinutes < -60
+                  ? Colors.red[100]
+                  : remain10.inMinutes < 0
+                      ? Colors.yellow[100]
+                      : Colors.green[100]),
         ]);
   }
 }
