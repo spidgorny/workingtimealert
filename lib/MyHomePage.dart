@@ -46,6 +46,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
+  }
+
   void initComeIn() async {
     print('await storage.ready');
     await storage.ready;
